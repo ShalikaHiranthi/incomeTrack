@@ -15,6 +15,13 @@
     <!-- Your header content -->
     <nav>
         <a href="{% url 'home' %}">🏠 Back to Home</a>
+        {% if user.is_authenticated %}
+            <span>Welcome, {{ user.username }}</span>
+            <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
     </nav>
   </header>
 

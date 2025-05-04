@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),  # Set home page URL
     path('earnings/', include('earnings.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
