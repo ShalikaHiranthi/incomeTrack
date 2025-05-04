@@ -17,10 +17,13 @@
         <a href="{% url 'home' %}">🏠 Back to Home</a>
         {% if user.is_authenticated %}
             <span>Welcome, {{ user.username }}</span>
-            <a href="{% url 'logout' %}">Logout</a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
         {% else %}
-            <a href="{% url 'login' %}">Login</a>
-            <a href="{% url 'register' %}">Register</a>
+            <a href="{% url 'login' %}" class="button">Login</a>
+            <a href="{% url 'register' %}" class="button">Register</a>
         {% endif %}
     </nav>
   </header>
