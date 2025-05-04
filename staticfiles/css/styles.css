@@ -18,3 +18,64 @@ footer {
     padding: 10px;
     text-align: center;
 }
+/* Home Page Styles */
+
+.home-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .home-container h1 {
+    font-size: 2.5rem;
+    color: #4CAF50;
+    margin-bottom: 20px;
+  }
+  
+  .home-container p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .home-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .home-buttons a {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .home-buttons a:hover {
+    background-color: #45a049;
+  }
+  
+  /* Responsive */
+  @media (max-width: 600px) {
+    .home-container h1 {
+      font-size: 2rem;
+    }
+  
+    .home-container p {
+      font-size: 1rem;
+    }
+  
+    .home-buttons {
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+  

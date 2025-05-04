@@ -1,20 +1,28 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Django App</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projwolt</title>
+
+  <!-- Link to global styles -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Django App</h1>
-    </header>
+  <header>
+    <!-- Your header content -->
+  </header>
 
-    <!-- Your page content goes here -->
+  <div class="content">
+    {% block content %}
+    {% endblock %}
+  </div>
 
-    <footer>
-        <p>&copy; 2025 My Django App</p>
-    </footer>
+  <footer>
+    <!-- Your footer content -->
+  </footer>
+
 </body>
 </html>

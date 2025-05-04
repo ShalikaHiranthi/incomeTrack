@@ -1,0 +1,61 @@
+/* Add Earning Form Styles */
+
+.add-earning-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-earning-container h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #4CAF50;
+    text-align: center;
+  }
+  
+  .add-earning-container form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-earning-container form p {
+    margin-bottom: 15px;
+    font-size: 1rem;
+  }
+  
+  .add-earning-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .add-earning-container input,
+  .add-earning-container select,
+  .add-earning-container textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  
+  .add-earning-container button {
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-earning-container button:hover {
+    background-color: #45a049;
+  }
+  

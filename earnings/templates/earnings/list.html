@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <link rel="stylesheet" href="{% static 'css/earnings.css' %}">
-
   <h2>Earnings List</h2>
 
+  <!-- Table for displaying earnings -->
   <table class="earnings-table">
     <thead>
       <tr>
@@ -24,5 +23,7 @@
     </tbody>
   </table>
 
-  <a href="{% url 'add_earning' %}">Add new earning</a>
+  <!-- Link to add a new earning -->
+  <a href="{% url 'add_earning' %}" class="add-new-earning">Add new earning</a>
+
 {% endblock %}
