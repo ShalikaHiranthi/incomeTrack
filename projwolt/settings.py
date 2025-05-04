@@ -117,6 +117,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # This is where your custom CSS/JS will go
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Render will collect static files here
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
