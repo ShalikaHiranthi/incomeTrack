@@ -3,10 +3,26 @@
 {% block content %}
   <link rel="stylesheet" href="{% static 'css/earnings.css' %}">
 
-<h2>Earnings List</h2>
-<ul>
-  {% for earning in earnings %}
-    <li>{{ earning.date }} - {{ earning.source }}: ${{ earning.amount }}</li>
-  {% endfor %}
-</ul>
-<a href="{% url 'add_earning' %}">Add new earning</a>
+  <h2>Earnings List</h2>
+
+  <table class="earnings-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Source</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for earning in earnings %}
+        <tr>
+          <td>{{ earning.date }}</td>
+          <td>{{ earning.source }}</td>
+          <td>${{ earning.amount }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{% url 'add_earning' %}">Add new earning</a>
+{% endblock %}
