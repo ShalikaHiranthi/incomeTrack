@@ -1,3 +1,12 @@
-static:
-  - name: static
-    path: staticfiles
+services:
+  - type: web
+    name: projwolt-app
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn projwolt.wsgi:application
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: projwolt.settings
