@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Earning
 from .forms import EarningForm
 
@@ -15,3 +15,8 @@ def add_earning(request):
     else:
         form = EarningForm()
     return render(request, 'earnings/form.html', {'form': form})
+
+def delete_earning(request, pk):
+    earning = get_object_or_404(Earning, pk=pk)
+    earning.delete()
+    return redirect('earning_list')
