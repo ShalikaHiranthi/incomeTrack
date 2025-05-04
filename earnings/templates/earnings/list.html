@@ -1,0 +1,7 @@
+<h2>Earnings List</h2>
+<ul>
+  {% for earning in earnings %}
+    <li>{{ earning.date }} - {{ earning.source }}: ${{ earning.amount }}</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'add_earning' %}">Add new earning</a>
