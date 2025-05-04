@@ -1,1 +1,1 @@
-web: gunicorn incomeTrack.wsgi:application
+web: gunicorn projwolt.wsgi:application
