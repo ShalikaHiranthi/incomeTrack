@@ -16,7 +16,7 @@ def register(request):
 
 @login_required
 def earning_list(request):
-    earnings = Earning.objects.all()
+    earnings = Earning.objects.filter(user=request.user)
     return render(request, 'earnings/list.html', {'earnings': earnings})
 
 @login_required
@@ -24,7 +24,9 @@ def add_earning(request):
     if request.method == 'POST':
         form = EarningForm(request.POST)
         if form.is_valid():
-            form.save()
+            earning = form.save(commit=False)
+            earning.user = request.user
+            earning.save()
             return redirect('earning_list')
     else:
         form = EarningForm()
