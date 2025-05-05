@@ -14,7 +14,7 @@
   <header>
     <!-- Your header content -->
     <nav>
-        <a href="{% url 'home' %}">🏠 Back to Home</a>
+        <a href="{% url 'home' %}"  class="button">🏠 Back to Home</a>
         {% if user.is_authenticated %}
             <span>Welcome, {{ user.username }}</span>
             <form method="post" action="{% url 'logout' %}">
