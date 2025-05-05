@@ -5,6 +5,8 @@ class Earning(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     source = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    tip = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     date = models.DateField()
     description = models.TextField(blank=True)
 

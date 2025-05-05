@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<div class="home-buttons">
+  <a href="{% url 'earning_list' %}">View Earnings</a>
+  <a href="{% url 'add_earning' %}">Add Earning</a>
+  <a href="{% url 'export_earnings_excel' %}" class="download-excel">Download as Excel</a>
+</div>
+
   <h2>Earnings List</h2>
 
   <!-- Table for displaying earnings -->
@@ -10,6 +17,8 @@
         <th>Date</th>
         <th>Source</th>
         <th>Amount</th>
+        <th>Tip</th>
+        <th>Total</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -19,7 +28,11 @@
           <td>{{ earning.date }}</td>
           <td>{{ earning.source }}</td>
           <td>${{ earning.amount }}</td>
+          <td>${{ earning.tip }}</td>
+          <td>${{ earning.total }}</td>
           <td>
+            <a href="{% url 'edit_earning' earning.pk %}" class="button">Edit</a>
+  |
             <form action="{% url 'delete_earning' earning.pk %}" method="post" style="display:inline;">
               {% csrf_token %}
               <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>

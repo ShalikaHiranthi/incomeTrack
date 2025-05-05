@@ -10,14 +10,14 @@ def home(request):
 
         total_earnings = (
             Earning.objects.filter(user=user)
-            .aggregate(total=Sum('amount'))['total'] or 0
+            .aggregate(total=Sum('total'))['total'] or 0
         )
 
         monthly_earnings = (
             Earning.objects.filter(user=user)
             .annotate(month=TruncMonth('date'))
             .values('month')
-            .annotate(total=Sum('amount'))
+            .annotate(total=Sum('total'))
             .order_by('month')
         )
 
@@ -29,9 +29,9 @@ def home(request):
             for earning in earnings:
                 month_key = earning.date.strftime("%Y-%m")
                 if earning.date.day <= 15:
-                    earnings_by_half_month[month_key]["start"] += earning.amount
+                    earnings_by_half_month[month_key]["start"] += earning.total
                 else:
-                    earnings_by_half_month[month_key]["end"] += earning.amount
+                    earnings_by_half_month[month_key]["end"] += earning.total
 
         # Convert to list of dicts sorted by month
         sorted_earnings = sorted(
@@ -41,6 +41,7 @@ def home(request):
     else:
         total_earnings = 0
         monthly_earnings = []
+        sorted_earnings = []
 
     return render(request, 'home.html', {
         'total_earnings': total_earnings,
