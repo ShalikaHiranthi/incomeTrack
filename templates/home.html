@@ -21,6 +21,8 @@
       <thead>
         <tr>
           <th>Month</th>
+          <th>1st–15th</th>
+          <th>16th–End</th>
           <th>Total</th>
         </tr>
       </thead>
@@ -28,6 +30,10 @@
         {% for item in monthly_earnings %}
           <tr>
             <td>{{ item.month|date:"F Y" }}</td>
+          {% for entry in half_month_earnings %}
+            <td>${{ entry.start|floatformat:2 }}</td>
+            <td>${{ entry.end|floatformat:2 }}</td>
+          {% endfor %}
             <td>${{ item.total|floatformat:2 }}</td>
           </tr>
         {% empty %}
@@ -35,6 +41,7 @@
             <td colspan="2">No earnings recorded yet.</td>
           </tr>
         {% endfor %}
+        
       </tbody>
     </table>
   </div>
