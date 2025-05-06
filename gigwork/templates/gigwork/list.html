@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="home-buttons">
+    <a href="{% url 'gigwork_list' %}">View Gigworks</a>
+    <a href="{% url 'add_gigwork' %}">Add Gigwork</a>
+    <a href="{% url 'import_gigwork' %}" class="btn btn-primary">Import from Excel</a>
+  </div>
+<h2>Gig Work Entries</h2>
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Duration (min)</th>
+    <th>Distance (km)</th>
+    <th>Earning (€)</th>
+    <th>Fuel Pay (€)</th>
+    <th>Total Pay (€)</th>
+    <th>Action</th>
+  </tr>
+  {% for gig in gigs %}
+  <tr>
+    <td>{{ gig.date }}</td>
+    <td>{{ gig.duration_min }}</td>
+    <td>{{ gig.distance_km }}</td>
+    <td>{{ gig.earning|floatformat:2 }}</td>
+    <td>{{ gig.fuel_pay|floatformat:2 }}</td>
+    <td>{{ gig.total_pay|floatformat:2 }}</td>
+    <td>
+        {% if gig.id %}
+            <a href="{% url 'gigwork_edit' gig.id %}" class="button">Edit</a> | 
+            <a href="{% url 'gigwork_delete' gig.id %}" class="button">Delete</a>
+        {% endif %}
+      </td>
+  </tr>
+  {% endfor %}
+</table>
+<a href="{% url 'add_gigwork' %}">Add New Gig</a>
+{% endblock %}
