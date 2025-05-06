@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 import pandas as pd
 from django.http import HttpResponse
+from django.db.models import F, Sum, ExpressionWrapper, DecimalField
 
 def register(request):
     if request.method == 'POST':
@@ -19,7 +20,15 @@ def register(request):
 @login_required
 def earning_list(request):
     earnings = Earning.objects.filter(user=request.user)
-    return render(request, 'earnings/list.html', {'earnings': earnings})
+
+    total_earnings = earnings.aggregate(
+        total=Sum(ExpressionWrapper(F('amount') + F('tip'), output_field=DecimalField()))
+    )['total'] or 0
+
+    return render(request, 'earnings/list.html', {
+        'earnings': earnings,
+        'total_earnings': total_earnings
+    })
 
 @login_required
 def add_earning(request):
