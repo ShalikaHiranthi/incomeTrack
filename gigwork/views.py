@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import GigWorkForm
 from .models import GigWork
 from django.contrib.auth.decorators import login_required
-from datetime import timedelta
+import datetime
 from .forms import ExcelImportForm
 import pandas as pd
+from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
+from django.db.models import Sum, F, Func, IntegerField, Value, Case, When
 
 
 @login_required
@@ -53,18 +55,22 @@ def import_gigwork(request):
         if form.is_valid():
             file = request.FILES['file']
             df = pd.read_excel(file)
+            df['date'] = pd.to_datetime(df['date']).dt.date  # Ensure proper date format
 
             user = request.user  # Logged-in user
 
             for _, row in df.iterrows():
-                hours = int(row['duration'])
-                minutes = int(round((row['duration'] - hours) * 100))
-                duration = timedelta(hours=hours, minutes=minutes)
+                if pd.isna(row['duration']) or pd.isna(row['distance_km']) or pd.isna(row['date']):
+                    continue  # Skip this row
+                # hours = int(row['duration'])
+                # minutes = int(round((row['duration'] - hours) * 100))
+                # duration = timedelta(hours=hours, minutes=minutes)
+                total_minutes = float(row['duration'])
 
                 gig = GigWork(
                     user=user,
                     delivery_details='Imported from Excel',
-                    duration=duration,
+                    duration=total_minutes,
                     distance_km=row['distance_km'],
                     date=row['date']
                 )
@@ -73,3 +79,28 @@ def import_gigwork(request):
     else:
         form = ExcelImportForm()
     return render(request, 'gigwork/import_gigwork.html', {'form': form})
+
+def get_half_month_totals(user=None):
+    from .models import GigWork  # adjust if you're placing this in a different file
+
+    qs = GigWork.objects.all()
+
+    if user:
+        qs = qs.filter(user=user)
+
+    qs = qs.annotate(
+        year=ExtractYear('date'),
+        month=ExtractMonth('date'),
+        day=ExtractDay('date'),
+        half=Case(
+            When(day__lte=15, then=Value(1)),
+            default=Value(2),
+            output_field=IntegerField()
+        )
+    ).values('user', 'year', 'month', 'half').annotate(
+        total_earning=Sum('earning'),
+        total_fuel=Sum('fuel_pay'),
+        total_total=Sum('total_pay')
+    ).order_by('user', 'year', 'month', 'half')
+
+    return qs

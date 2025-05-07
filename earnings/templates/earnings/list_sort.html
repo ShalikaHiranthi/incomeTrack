@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+<div class="home-container">
+  <h1>Welcome to Wolt Payment Tracker</h1>
+  <p>Manage your earnings, track your progress, and stay in control of your finances.</p>
+  
+  <div class="home-buttons">
+    <a href="{% url 'earning_list_sort' %}">View Earnings by weeks</a>
+    <a href="{% url 'earning_list' %}">View Earnings</a>
+    <a href="{% url 'add_earning' %}">Add Earning</a>
+  </div>
+</div>
+<div class="home-container">
+    <p class="total">Total Earnings: ${{ total_earnings|floatformat:2 }}</p>
+  
+    <h2>Monthly Earnings</h2>
+    <table class="monthly-table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>1st–15th</th>
+          <th>16th–End</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in monthly_earnings %}
+          <tr>
+            <td>{{ item.month|date:"F Y" }}</td>
+          {% for entry in half_month_earnings %}
+            <td>${{ entry.start|floatformat:2 }}</td>
+            <td>${{ entry.end|floatformat:2 }}</td>
+          {% endfor %}
+            <td>${{ item.total|floatformat:2 }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="2">No earnings recorded yet.</td>
+          </tr>
+        {% endfor %}
+        
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

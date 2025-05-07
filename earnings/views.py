@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 import pandas as pd
 from django.http import HttpResponse
 from django.db.models import F, Sum, ExpressionWrapper, DecimalField
+from django.db.models.functions import TruncMonth
+from collections import defaultdict
 
 def register(request):
     if request.method == 'POST':
@@ -28,6 +30,55 @@ def earning_list(request):
     return render(request, 'earnings/list.html', {
         'earnings': earnings,
         'total_earnings': total_earnings
+    })
+
+@login_required
+def earning_list_sort(request):
+    
+    user = request.user
+
+    if request.user.is_authenticated:
+
+        total_earnings = (
+            Earning.objects.filter(user=user)
+            .aggregate(total=Sum('total'))['total'] or 0
+        )
+
+        monthly_earnings = (
+            Earning.objects.filter(user=user)
+            .annotate(month=TruncMonth('date'))
+            .values('month')
+            .annotate(total=Sum('total'))
+            .order_by('month')
+        )
+
+        earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
+
+        if user.is_authenticated:
+            earnings = Earning.objects.filter(user=user)
+
+            for earning in earnings:
+                month_key = earning.date.strftime("%Y-%m")
+                if earning.date.day <= 15:
+                    earnings_by_half_month[month_key]["start"] += earning.total
+                else:
+                    earnings_by_half_month[month_key]["end"] += earning.total
+
+        # Convert to list of dicts sorted by month
+        sorted_earnings = sorted(
+            [{"month": k, **v} for k, v in earnings_by_half_month.items()],
+            key=lambda x: x["month"]
+        )
+    else:
+        total_earnings = 0
+        monthly_earnings = []
+        sorted_earnings = []
+
+    return render(request, 'earnings/list_sort.html', {
+        'earnings': earnings,
+        'total_earnings': total_earnings,
+        'monthly_earnings': monthly_earnings,
+        'half_month_earnings': sorted_earnings
     })
 
 @login_required
