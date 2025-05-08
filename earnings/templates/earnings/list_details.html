@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="home-buttons">
+  <a href="{% url 'earning_list' %}">View Earnings</a>
+  <a href="{% url 'add_earning_details' earning_id %}" class="button">Add Details</a>
+</div>
+
+  <h2>Earnings List</h2>
+
+  <!-- Table for displaying earnings -->
+  <table class="earnings-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Source</th>
+        <th>Amount</th>
+        <th>Tip</th>
+        <th>Total</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for details in earning_details %}
+        <tr>
+          <td>{{ details.date }}</td>
+          <td>{{ details.source }}</td>
+          <td>${{ details.amount }}</td>
+          <td>${{ details.tip }}</td>
+          <td>${{ details.total }}</td>
+          <td>
+            
+            <a href="{% url 'edit_earning_detail' details.pk %}" class="button">Edit</a>
+  |
+            <form action="{% url 'delete_earning_detail' details.pk %}" method="post" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Link to add a new earning -->
+  <a href="{% url 'add_earning' %}" class="add-new-earning">Add new earning</a>
+
+{% endblock %}

@@ -7,6 +7,9 @@ from .forms import ExcelImportForm
 import pandas as pd
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
 from django.db.models import Sum, F, Func, IntegerField, Value, Case, When
+from django.http import HttpResponse
+from django.db.models.functions import TruncMonth
+from collections import defaultdict
 
 
 @login_required
@@ -25,7 +28,15 @@ def add_gigwork(request):
 @login_required
 def gigwork_list(request):
     gigs = GigWork.objects.filter(user=request.user)
-    return render(request, 'gigwork/list.html', {'gigs': gigs})
+    
+    total = 0
+    for gig in gigs:
+        total += gig.total_pay
+
+    return render(request, 'gigwork/list.html', {
+        'gigs': gigs,
+        'total_earnings': total
+    })
 
 @login_required
 def gigwork_edit(request, id):
@@ -47,6 +58,7 @@ def gigwork_delete(request, id):
     gigwork = get_object_or_404(GigWork, id=id)
     gigwork.delete()
     return redirect('gigwork_list')
+
 
 @login_required
 def import_gigwork(request):
@@ -104,3 +116,66 @@ def get_half_month_totals(user=None):
     ).order_by('user', 'year', 'month', 'half')
 
     return qs
+
+@login_required
+def export_gigs_excel(request):
+    gigs = GigWork.objects.filter().values('date', 'duration', 'duration_min', 'distance_km', 'earning', 'fuel_pay', 'total_pay')
+
+    if not gigs:
+        return HttpResponse("No earnings to export.", content_type="text/plain")
+
+    df = pd.DataFrame(gigs)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=gigs.xlsx'
+    df.to_excel(response, index=False, engine='openpyxl')
+
+    return response
+
+@login_required
+def sort_gigs(request):
+    
+    user = request.user
+
+    if request.user.is_authenticated:
+
+        total_earnings = (
+            GigWork.objects.filter(user=user)
+            .aggregate(total=Sum('total_pay'))['total'] or 0
+        )
+
+        monthly_earnings = (
+            GigWork.objects.filter(user=user)
+            .annotate(month=TruncMonth('date'))
+            .values('month')
+            .annotate(total=Sum('total_pay'))
+            .order_by('month')
+        )
+
+        earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
+
+        if user.is_authenticated:
+            earnings = GigWork.objects.filter(user=user)
+
+            for earning in earnings:
+                month_key = earning.date.strftime("%Y-%m")
+                if earning.date.day <= 15:
+                    earnings_by_half_month[month_key]["start"] += earning.total_pay
+                else:
+                    earnings_by_half_month[month_key]["end"] += earning.total_pay
+
+        # Convert to list of dicts sorted by month
+        sorted_earnings = sorted(
+            [{"month": k, **v} for k, v in earnings_by_half_month.items()],
+            key=lambda x: x["month"]
+        )
+    else:
+        total_earnings = 0
+        monthly_earnings = []
+        sorted_earnings = []
+
+    return render(request, 'gigwork/list_sort.html', {
+        'earnings': earnings,
+        'total_earnings': total_earnings,
+        'monthly_earnings': monthly_earnings,
+        'half_month_earnings': sorted_earnings
+    })

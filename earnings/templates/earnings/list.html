@@ -15,10 +15,8 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Source</th>
-        <th>Amount</th>
-        <th>Tip</th>
-        <th>Total</th>
+        <th>Title</th>
+        <th>Sub Total</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -26,11 +24,11 @@
       {% for earning in earnings %}
         <tr>
           <td>{{ earning.date }}</td>
-          <td>{{ earning.source }}</td>
-          <td>${{ earning.amount }}</td>
-          <td>${{ earning.tip }}</td>
-          <td>${{ earning.total }}</td>
+          <td>{{ earning.title }}</td>
+          <td>${{ earning.sub_total }}</td>
           <td>
+            <a href="{% url 'add_earning_details' earning.id %}" class="button">Add Details</a>  |
+            <a href="{% url 'earning_list_details' earning.id %}" class="button">View Details</a>  |
             <a href="{% url 'edit_earning' earning.pk %}" class="button">Edit</a>
   |
             <form action="{% url 'delete_earning' earning.pk %}" method="post" style="display:inline;">

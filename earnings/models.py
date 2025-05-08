@@ -3,12 +3,28 @@ from django.contrib.auth.models import User
 
 class Earning(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    title = models.CharField(max_length=100)
+    sub_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.title} - {self.sub_total}"
+    
+class EarningDetail(models.Model):
+    earning = models.ForeignKey(Earning, on_delete=models.CASCADE, related_name='details')
     source = models.CharField(max_length=100)
+    date = models.DateField(blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     tip = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    date = models.DateField()
-    description = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.earning and not self.date:
+            self.date = self.earning.date
+        super().save(*args, **kwargs)
+
+    def subtotal(self):
+        return self.amount + self.tip
 
     def __str__(self):
-        return f"{self.source} - {self.amount}"
+        return f"{self.source} - {self.total}"
