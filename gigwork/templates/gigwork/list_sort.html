@@ -41,11 +41,17 @@
           {% if item.ispaid_part1 == "Yes" %}
             <span class="ispaid">Paid</span>
           {% endif %}
+          {% if item.ispaid_part1 == "Next" %}
+            <span class="isnext">Next</span>
+          {% endif %}
 
         </td>
         <td>${{ item.end|floatformat:2 }}
           {% if item.ispaid_part2 == "Yes" %}
             <span class="ispaid">Paid</span>
+          {% endif %}
+          {% if item.ispaid_part2 == "Next" %}
+            <span class="isnext">Next</span>
           {% endif %}
         </td>
         <td>${{ item.total|floatformat:2 }}</td>

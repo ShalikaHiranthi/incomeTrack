@@ -143,10 +143,16 @@
   }
 
   span.ispaid {
+      padding: 10px;
+      background-color: lightblue;
+      border-radius: 15px;
+  }
+
+  span.isnext {
     padding: 10px;
-    background-color: lightblue;
+    background-color: lightsalmon;
     border-radius: 15px;
-}
+  }
 
   .totalamounts{
     color: #000;
