@@ -10,6 +10,15 @@
   <!-- Link to global styles -->
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    
+    canvas {
+      max-width: 800px;
+      margin: 40px auto;
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -30,19 +39,70 @@
   </header>
 
   <div class="content">
+
     {% if total_earnings %}
       <p class="total">Total Earnings: <span class="totalamounts">${{ total_earnings|floatformat:2 }}</span></p>
     {% endif %}
+    
+
     {% if total_gigs %}
       <p class="total">Total Gigs: <span class="totalamounts">${{ total_gigs|floatformat:2 }}</span></p>
     {% endif %}
+    
     {% block content %}
     {% endblock %}
   </div>
 
+  
+
   <footer>
     <!-- Your footer content -->
   </footer>
+  <script>
+    const monthlyData = {{ monthly_data|safe }};
+    
+    const labels = monthlyData.map(entry => entry.month);  // e.g., "2025-03"
+    const startValues = monthlyData.map(entry => entry.start);
+    const endValues = monthlyData.map(entry => entry.end);
+    const totalValues = monthlyData.map(entry => entry.total);
+
+    new Chart(document.getElementById("monthlyChart"), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'First 2 weeks Earnings',
+                    data: startValues,
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    tension: 0.3,
+                },
+                {
+                    label: 'Last 2 weeks Earnings',
+                    data: endValues,
+                    fill: false,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    tension: 0.3,
+                },
+                {
+                    label: 'Total Earnings',
+                    data: totalValues,
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    tension: 0.3,
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

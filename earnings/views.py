@@ -34,6 +34,9 @@ def earning_list(request):
 
 @login_required
 def earning_list_sort(request):
+    total_earnings = 0
+    monthly_earnings = []
+    sorted_earnings = []
     
     user = request.user
 
@@ -69,11 +72,7 @@ def earning_list_sort(request):
             [{"month": k, **v} for k, v in earnings_by_half_month.items()],
             key=lambda x: x["month"]
         )
-    else:
-        total_earnings = 0
-        monthly_earnings = []
-        sorted_earnings = []
-
+    
     return render(request, 'earnings/list_sort.html', {
         'earnings': earnings,
         'total_earnings': total_earnings,

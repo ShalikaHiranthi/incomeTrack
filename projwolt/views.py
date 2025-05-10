@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.db.models import Sum
-from django.db.models.functions import TruncMonth
 from earnings.models import Earning
-from gigwork.models import GigWork
-from collections import defaultdict
+from gigwork.models import GigWork, WeeklyEarning
 
 def home(request):
+    total_earnings = 0
+    total_gigs = 0
     user = request.user
     if request.user.is_authenticated:
 
@@ -18,13 +18,10 @@ def home(request):
                 GigWork.objects.filter(user=user)
                 .aggregate(total=Sum('total_pay'))['total'] or 0
             )
-
         
-    else:
-        total_earnings = 0
-        total_gigs = 0
+        
 
     return render(request, 'home.html', {
         'total_earnings': total_earnings,
-        'total_gigs': total_gigs,
+        'total_gigs': total_gigs
     })

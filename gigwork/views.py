@@ -10,6 +10,8 @@ from django.db.models import Sum, F, Func, IntegerField, Value, Case, When
 from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
 from collections import defaultdict
+import json
+from django.db.models.functions import TruncWeek
 import logging
 logger = logging.getLogger(__name__)
 
@@ -139,6 +141,7 @@ def sort_gigs(request):
     earnings = []
     total_gigs = 0
     sorted_earnings = []
+    weekly_data = []
 
     if request.user.is_authenticated:
 
@@ -182,8 +185,27 @@ def sort_gigs(request):
                 .aggregate(total=Sum('total_pay'))['total'] or 0
             )
 
+        # Get monthly data with month and total earnings
+        raw_monthly_data = WeeklyEarning.objects.filter(user=user).annotate(month_annotated=TruncMonth('month')).values('month_annotated').annotate(
+            start=Sum('start'), 
+            end=Sum('end'),
+            total=Sum('total')
+        ).order_by('month_annotated')
+
+        # Convert to a JSON-safe structure (datetime and Decimal to float)
+        monthly_data = [
+            {
+                'month': entry['month_annotated'].strftime('%Y-%m'),  # Format the date as YYYY-MM
+                'start': float(entry['start']),
+                'end': float(entry['end']),
+                'total': float(entry['total'])  # Convert the Decimal to float
+            }
+            for entry in raw_monthly_data
+        ]
+
     return render(request, 'gigwork/list_sort.html', {
         'total_gigs': total_gigs,
+        'monthly_data': monthly_data,
         'half_month_earnings': sorted_earnings
     })
 
@@ -193,7 +215,7 @@ def update_weekly_earning(request, id):
 
     if request.method == 'POST':
         form = WeeklyEarningForm(request.POST, instance=week)
-        logging.debug(request.POST.get("ispaid_part1"))
+        #logging.debug(request.POST.get("ispaid_part1"))
         if form.is_valid():
             form.save()
             return redirect('sort_gigs')
