@@ -10,6 +10,8 @@ from django.db.models import Sum, F, Func, IntegerField, Value, Case, When
 from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
 from collections import defaultdict
+import logging
+logger = logging.getLogger(__name__)
 
 
 @login_required
@@ -158,6 +160,7 @@ def sort_gigs(request):
 
             for earning in earnings:
                 month_key = earning.date.strftime("%Y-%m")
+
                 if earning.date.day <= 15:
                     earnings_by_half_month[month_key]["start"] += earning.total_pay
                 else:
@@ -165,9 +168,17 @@ def sort_gigs(request):
 
         # Convert to list of dicts sorted by month
         sorted_earnings = sorted(
-            [{"month": k, **v} for k, v in earnings_by_half_month.items()],
+            [{
+                "month": k,
+                "start": v["start"],
+                "end": v["end"],
+                "total": v["start"] + v["end"]
+            } for k, v in earnings_by_half_month.items()],
             key=lambda x: x["month"]
         )
+        logging.debug(sorted_earnings)
+            
+        
     else:
         total_earnings = 0
         monthly_earnings = []

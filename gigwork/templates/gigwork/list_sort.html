@@ -28,13 +28,12 @@
         </tr>
       </thead>
       <tbody>
-        {% for item in monthly_earnings %}
+        {% for item in half_month_earnings %}
           <tr>
-            <td>{{ item.month|date:"F Y" }}</td>
-          {% for entry in half_month_earnings %}
-            <td>${{ entry.start|floatformat:2 }}</td>
-            <td>${{ entry.end|floatformat:2 }}</td>
-          {% endfor %}
+            <td>{{ item.month }}</td>
+            <td>${{ item.start|floatformat:2 }}</td>
+            <td>${{ item.end|floatformat:2 }}</td>
+          
             <td>${{ item.total|floatformat:2 }}</td>
           </tr>
         {% empty %}

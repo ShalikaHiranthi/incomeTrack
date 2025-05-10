@@ -4,7 +4,7 @@ from .models import Earning, EarningDetail
 class EarningForm(forms.ModelForm):
     class Meta:
         model = Earning
-        fields = ['date', 'title']
+        fields = ['date', 'title','sub_total']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
