@@ -137,7 +137,7 @@ def export_gigs_excel(request):
 def sort_gigs(request):
     user = request.user
     earnings = []
-    total_earnings = 0
+    total_gigs = 0
     sorted_earnings = []
 
     if request.user.is_authenticated:
@@ -149,11 +149,6 @@ def sort_gigs(request):
             # Process gig data
             earnings = GigWork.objects.filter(user=user)
             earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
-
-            total_earnings = (
-                GigWork.objects.filter(user=user)
-                .aggregate(total=Sum('total_pay'))['total'] or 0
-            )
 
             for earning in earnings:
                 month_key = earning.date.strftime("%Y-%m")
@@ -182,13 +177,13 @@ def sort_gigs(request):
 
         else:
             sorted_earnings = WeeklyEarning.objects.filter(user=user).order_by('month')
-            total_earnings = (
+            total_gigs = (
                 GigWork.objects.filter(user=user)
                 .aggregate(total=Sum('total_pay'))['total'] or 0
             )
 
     return render(request, 'gigwork/list_sort.html', {
-        'total_earnings': total_earnings,
+        'total_gigs': total_gigs,
         'half_month_earnings': sorted_earnings
     })
 

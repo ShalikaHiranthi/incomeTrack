@@ -141,9 +141,15 @@
       font-size: 1.5em;
     }
   }
-  
+
   span.ispaid {
     padding: 10px;
     background-color: lightblue;
     border-radius: 15px;
 }
+
+  .totalamounts{
+    color: #000;
+    font-size: 1.4rem;
+    font-weight: bold;
+  }

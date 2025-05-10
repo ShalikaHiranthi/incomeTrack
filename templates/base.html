@@ -30,7 +30,12 @@
   </header>
 
   <div class="content">
-    <p class="total">Total Earnings: ${{ total_earnings|floatformat:2 }}</p>
+    {% if total_earnings %}
+      <p class="total">Total Earnings: <span class="totalamounts">${{ total_earnings|floatformat:2 }}</span></p>
+    {% endif %}
+    {% if total_gigs %}
+      <p class="total">Total Gigs: <span class="totalamounts">${{ total_gigs|floatformat:2 }}</span></p>
+    {% endif %}
     {% block content %}
     {% endblock %}
   </div>
