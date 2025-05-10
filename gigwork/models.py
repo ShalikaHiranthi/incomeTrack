@@ -26,12 +26,16 @@ class GigWork(models.Model):
         return f"GigWork on {self.date} for {self.user.username}"
     
 class WeeklyEarning(models.Model):
+    YES_NO_CHOICES = [
+        ("Yes", "Yes"),
+        ("No", "No"),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     month = models.DateField()
     start = models.DecimalField(max_digits=10, decimal_places=2)
-    ispaid_part1 = models.TextField()
+    ispaid_part1 = models.CharField(max_length=3, choices=YES_NO_CHOICES)
     end = models.DecimalField(max_digits=10, decimal_places=2)
-    ispaid_part2 = models.TextField()
+    ispaid_part2 = models.CharField(max_length=3, choices=YES_NO_CHOICES)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):

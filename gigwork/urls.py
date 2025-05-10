@@ -9,4 +9,5 @@ urlpatterns = [
     path('import/', views.import_gigwork, name='import_gigwork'),
     path('export/', views.export_gigs_excel, name='export_gigs_excel'),
     path('sort/', views.sort_gigs, name='sort_gigs'),
+    path('edit-week/<int:id>/', views.update_weekly_earning, name='update_weekly_earning'),
 ]

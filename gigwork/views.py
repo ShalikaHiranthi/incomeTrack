@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import GigWorkForm
+from .forms import GigWorkForm, WeeklyEarningForm
 from .models import GigWork, WeeklyEarning
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
@@ -138,103 +138,71 @@ def sort_gigs(request):
     user = request.user
     earnings = []
     total_earnings = 0
-    monthly_earnings = []
     sorted_earnings = []
 
-    if request.method == 'POST' and request.POST.get("generate") == "1":
-        # Clear old entries (optional)
-        WeeklyEarning.objects.filter(user=user).delete()
+    if request.user.is_authenticated:
 
-        # Process gig data
-        earnings = GigWork.objects.filter(user=user)
-        earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
+        if request.method == 'POST' and request.POST.get("generate") == "1":
+            # Clear old entries (optional)
+            WeeklyEarning.objects.filter(user=user).delete()
 
-        for earning in earnings:
-            month_key = earning.date.strftime("%Y-%m")
-            if earning.date.day <= 15:
-                earnings_by_half_month[month_key]["start"] += earning.total_pay
-            else:
-                earnings_by_half_month[month_key]["end"] += earning.total_pay
+            # Process gig data
+            earnings = GigWork.objects.filter(user=user)
+            earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
 
-        for k, v in earnings_by_half_month.items():
-            
-            total = v["start"] + v["end"]
-            month_date = datetime.strptime(k + "-01", "%Y-%m-%d")
-            logging.debug(month_date)
-            # Save to database
-            WeeklyEarning.objects.create(
-                user=user,
-                month=month_date,
-                start=v["start"],
-                end=v["end"],
-                total=total
+            total_earnings = (
+                GigWork.objects.filter(user=user)
+                .aggregate(total=Sum('total_pay'))['total'] or 0
             )
 
-        # Fetch for display
-        sorted_earnings = WeeklyEarning.objects.filter(user=user).order_by('month')
-        
+            for earning in earnings:
+                month_key = earning.date.strftime("%Y-%m")
+                if earning.date.day <= 15:
+                    earnings_by_half_month[month_key]["start"] += earning.total_pay
+                else:
+                    earnings_by_half_month[month_key]["end"] += earning.total_pay
 
-    else:
-        sorted_earnings = WeeklyEarning.objects.filter(user=user).order_by('month')
+            for k, v in earnings_by_half_month.items():
+                
+                total = v["start"] + v["end"]
+                month_date = datetime.strptime(k + "-01", "%Y-%m-%d")
+                
+                # Save to database
+                WeeklyEarning.objects.create(
+                    user=user,
+                    month=month_date,
+                    start=v["start"],
+                    end=v["end"],
+                    total=total
+                )
+
+            # Fetch for display
+            sorted_earnings = WeeklyEarning.objects.filter(user=user).order_by('month')
+            
+
+        else:
+            sorted_earnings = WeeklyEarning.objects.filter(user=user).order_by('month')
+            total_earnings = (
+                GigWork.objects.filter(user=user)
+                .aggregate(total=Sum('total_pay'))['total'] or 0
+            )
 
     return render(request, 'gigwork/list_sort.html', {
+        'total_earnings': total_earnings,
         'half_month_earnings': sorted_earnings
     })
 
-# @login_required
-# def sort_gigs(request):
-    
-#     user = request.user
+@login_required
+def update_weekly_earning(request, id):
+    week = get_object_or_404(WeeklyEarning, id=id, user=request.user)
 
-#     if request.user.is_authenticated:
+    if request.method == 'POST':
+        form = WeeklyEarningForm(request.POST, instance=week)
+        logging.debug(request.POST.get("ispaid_part1"))
+        if form.is_valid():
+            form.save()
+            return redirect('sort_gigs')
+    else:
+        form = WeeklyEarningForm(instance=week)
 
-#         total_earnings = (
-#             GigWork.objects.filter(user=user)
-#             .aggregate(total=Sum('total_pay'))['total'] or 0
-#         )
-
-#         monthly_earnings = (
-#             GigWork.objects.filter(user=user)
-#             .annotate(month=TruncMonth('date'))
-#             .values('month')
-#             .annotate(total=Sum('total_pay'))
-#             .order_by('month')
-#         )
-
-#         earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
-
-#         if user.is_authenticated:
-#             earnings = GigWork.objects.filter(user=user)
-
-#             for earning in earnings:
-#                 month_key = earning.date.strftime("%Y-%m")
-
-#                 if earning.date.day <= 15:
-#                     earnings_by_half_month[month_key]["start"] += earning.total_pay
-#                 else:
-#                     earnings_by_half_month[month_key]["end"] += earning.total_pay
-
-#         # Convert to list of dicts sorted by month
-#         sorted_earnings = sorted(
-#             [{
-#                 "month": k,
-#                 "start": v["start"],
-#                 "end": v["end"],
-#                 "total": v["start"] + v["end"]
-#             } for k, v in earnings_by_half_month.items()],
-#             key=lambda x: x["month"]
-#         )
-#         logging.debug(sorted_earnings)
-            
-        
-#     else:
-#         total_earnings = 0
-#         monthly_earnings = []
-#         sorted_earnings = []
-
-#     return render(request, 'gigwork/list_sort.html', {
-#         'earnings': earnings,
-#         'total_earnings': total_earnings,
-#         'monthly_earnings': monthly_earnings,
-#         'half_month_earnings': sorted_earnings
-#     })
+    return render(request, 'gigwork/form.html', {'form': form, 'week': week, 'earning_id':id})

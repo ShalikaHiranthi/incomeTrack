@@ -126,6 +126,12 @@
   .mt-20 {
     margin-top: 20px;
   }
+
+  span.ispaid {
+    padding: 10px;
+    background-color: lightblue;
+    border-radius: 15px;
+  }
   
   /* Responsive Design */
   @media (max-width: 768px) {

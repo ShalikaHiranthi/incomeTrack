@@ -30,15 +30,28 @@
         <th>1st Half ($)</th>
         <th>2nd Half ($)</th>
         <th>Total ($)</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
       {% for item in half_month_earnings %}
       <tr>
         <td>{{ item.month|date:"F Y" }}</td>
-        <td>${{ item.start|floatformat:2 }}</td>
-        <td>${{ item.end|floatformat:2 }}</td>
+        <td>${{ item.start|floatformat:2 }}
+          {% if item.ispaid_part1 == "Yes" %}
+            <span class="ispaid">Paid</span>
+          {% endif %}
+
+        </td>
+        <td>${{ item.end|floatformat:2 }}
+          {% if item.ispaid_part2 == "Yes" %}
+            <span class="ispaid">Paid</span>
+          {% endif %}
+        </td>
         <td>${{ item.total|floatformat:2 }}</td>
+        <td>
+          <a href="{% url 'update_weekly_earning' item.id %}" class="button">Edit</a>
+        </td>
       </tr>
       {% endfor %}
     </tbody>

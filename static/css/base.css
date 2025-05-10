@@ -142,3 +142,8 @@
     }
   }
   
+  span.ispaid {
+    padding: 10px;
+    background-color: lightblue;
+    border-radius: 15px;
+}
