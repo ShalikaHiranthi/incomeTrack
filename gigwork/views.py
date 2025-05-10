@@ -10,8 +10,6 @@ from django.db.models import Sum, F, Func, IntegerField, Value, Case, When
 from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
 from collections import defaultdict
-import json
-from django.db.models.functions import TruncWeek
 import logging
 logger = logging.getLogger(__name__)
 
@@ -141,7 +139,7 @@ def sort_gigs(request):
     earnings = []
     total_gigs = 0
     sorted_earnings = []
-    weekly_data = []
+    monthly_data = []
 
     if request.user.is_authenticated:
 

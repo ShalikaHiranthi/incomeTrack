@@ -1,5 +1,5 @@
 from django import forms
-from .models import Earning, EarningDetail
+from .models import Earning, EarningDetail, Weeklypayments
 
 class EarningForm(forms.ModelForm):
     class Meta:
@@ -13,4 +13,12 @@ class EarningDetailForm(forms.ModelForm):
     class Meta:
         model = EarningDetail
         fields = ['source', 'amount', 'tip']
+
+class ExcelImportForm(forms.Form):
+    file = forms.FileField(label='Select Excel file')
+
+class WeeklyPayForm(forms.ModelForm):
+    class Meta:
+        model = Weeklypayments
+        fields = ['month','start', 'ispaid_part1', 'end', 'ispaid_part2']
         

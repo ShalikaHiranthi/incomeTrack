@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/add_earning.css' %}">
+
+<div class="add-earning-container">
+  <h2>Update weekly payments</h2>
+  <form method="POST" action="{% url 'update_weekly_earning' earning_id %}">
+    {% csrf_token %}
+    
+    <label for="ispaid_part1">Is Paid (Part 1):</label>
+    <select name="ispaid_part1" id="ispaid_part1">
+      <option value="Yes" {% if earning.ispaid_part1 == "Yes" %}selected{% endif %}>Yes</option>
+      <option value="No" {% if earning.ispaid_part1 == "No" %}selected{% endif %}>No</option>
+    </select>
+    <label for="ispaid_part2">Is Paid (Part 2):</label>
+    <select name="ispaid_part2" id="ispaid_part2">
+      <option value="Yes" {% if earning.ispaid_part2 == "Yes" %}selected{% endif %}>Yes</option>
+      <option value="No" {% if earning.ispaid_part2 == "No" %}selected{% endif %}>No</option>
+    </select>
+  
+    <!-- Add other fields here -->
+  
+    <button type="submit">Update</button>
+  </form>
+</div>
+{% endblock %}

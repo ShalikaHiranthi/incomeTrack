@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="home-buttons">
+    <a href="{% url 'sort_gigs' %}">View Gigworks by weeks</a>
     <a href="{% url 'gigwork_list' %}">View Gigworks</a>
     <a href="{% url 'add_gigwork' %}">Add Gigwork</a>
     <a href="{% url 'import_gigwork' %}" class="btn btn-primary">Import from Excel</a>
