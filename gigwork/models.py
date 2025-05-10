@@ -24,3 +24,15 @@ class GigWork(models.Model):
 
     def __str__(self):
         return f"GigWork on {self.date} for {self.user.username}"
+    
+class WeeklyEarning(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    month = models.DateField()
+    start = models.DecimalField(max_digits=10, decimal_places=2)
+    ispaid_part1 = models.TextField()
+    end = models.DecimalField(max_digits=10, decimal_places=2)
+    ispaid_part2 = models.TextField()
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.month.strftime('%Y-%m')}"

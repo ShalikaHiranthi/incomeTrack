@@ -16,33 +16,33 @@
 </div>
 <div class="home-container">
     <p class="total">Total Earnings: ${{ total_earnings|floatformat:2 }}</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" name="generate" value="1">Generate & Save to DB</button>
+    </form>
   
     <h2>Monthly Earnings</h2>
-    <table class="monthly-table">
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>1st–15th</th>
-          <th>16th–End</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in half_month_earnings %}
-          <tr>
-            <td>{{ item.month }}</td>
-            <td>${{ item.start|floatformat:2 }}</td>
-            <td>${{ item.end|floatformat:2 }}</td>
-          
-            <td>${{ item.total|floatformat:2 }}</td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="2">No earnings recorded yet.</td>
-          </tr>
-        {% endfor %}
-        
-      </tbody>
-    </table>
+    {% if half_month_earnings %}
+  <table>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>1st Half ($)</th>
+        <th>2nd Half ($)</th>
+        <th>Total ($)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in half_month_earnings %}
+      <tr>
+        <td>{{ item.month|date:"F Y" }}</td>
+        <td>${{ item.start|floatformat:2 }}</td>
+        <td>${{ item.end|floatformat:2 }}</td>
+        <td>${{ item.total|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
   </div>
 {% endblock %}

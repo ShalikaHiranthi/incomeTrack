@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import GigWorkForm
-from .models import GigWork
+from .models import GigWork, WeeklyEarning
 from django.contrib.auth.decorators import login_required
-import datetime
+from datetime import datetime
 from .forms import ExcelImportForm
 import pandas as pd
 from django.db.models.functions import ExtractDay, ExtractMonth, ExtractYear
@@ -135,58 +135,106 @@ def export_gigs_excel(request):
 
 @login_required
 def sort_gigs(request):
-    
     user = request.user
+    earnings = []
+    total_earnings = 0
+    monthly_earnings = []
+    sorted_earnings = []
 
-    if request.user.is_authenticated:
+    if request.method == 'POST' and request.POST.get("generate") == "1":
+        # Clear old entries (optional)
+        WeeklyEarning.objects.filter(user=user).delete()
 
-        total_earnings = (
-            GigWork.objects.filter(user=user)
-            .aggregate(total=Sum('total_pay'))['total'] or 0
-        )
-
-        monthly_earnings = (
-            GigWork.objects.filter(user=user)
-            .annotate(month=TruncMonth('date'))
-            .values('month')
-            .annotate(total=Sum('total_pay'))
-            .order_by('month')
-        )
-
+        # Process gig data
+        earnings = GigWork.objects.filter(user=user)
         earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
 
-        if user.is_authenticated:
-            earnings = GigWork.objects.filter(user=user)
+        for earning in earnings:
+            month_key = earning.date.strftime("%Y-%m")
+            if earning.date.day <= 15:
+                earnings_by_half_month[month_key]["start"] += earning.total_pay
+            else:
+                earnings_by_half_month[month_key]["end"] += earning.total_pay
 
-            for earning in earnings:
-                month_key = earning.date.strftime("%Y-%m")
-
-                if earning.date.day <= 15:
-                    earnings_by_half_month[month_key]["start"] += earning.total_pay
-                else:
-                    earnings_by_half_month[month_key]["end"] += earning.total_pay
-
-        # Convert to list of dicts sorted by month
-        sorted_earnings = sorted(
-            [{
-                "month": k,
-                "start": v["start"],
-                "end": v["end"],
-                "total": v["start"] + v["end"]
-            } for k, v in earnings_by_half_month.items()],
-            key=lambda x: x["month"]
-        )
-        logging.debug(sorted_earnings)
+        for k, v in earnings_by_half_month.items():
             
+            total = v["start"] + v["end"]
+            month_date = datetime.strptime(k + "-01", "%Y-%m-%d")
+            logging.debug(month_date)
+            # Save to database
+            WeeklyEarning.objects.create(
+                user=user,
+                month=month_date,
+                start=v["start"],
+                end=v["end"],
+                total=total
+            )
+
+        # Fetch for display
+        sorted_earnings = WeeklyEarning.objects.filter(user=user).order_by('month')
         
+
     else:
-        total_earnings = 0
-        monthly_earnings = []
-        sorted_earnings = []
+        sorted_earnings = WeeklyEarning.objects.filter(user=user).order_by('month')
 
     return render(request, 'gigwork/list_sort.html', {
-        'earnings': earnings,
-        'total_earnings': total_earnings,
-        'monthly_earnings': monthly_earnings,
         'half_month_earnings': sorted_earnings
     })
+
+# @login_required
+# def sort_gigs(request):
+    
+#     user = request.user
+
+#     if request.user.is_authenticated:
+
+#         total_earnings = (
+#             GigWork.objects.filter(user=user)
+#             .aggregate(total=Sum('total_pay'))['total'] or 0
+#         )
+
+#         monthly_earnings = (
+#             GigWork.objects.filter(user=user)
+#             .annotate(month=TruncMonth('date'))
+#             .values('month')
+#             .annotate(total=Sum('total_pay'))
+#             .order_by('month')
+#         )
+
+#         earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
+
+#         if user.is_authenticated:
+#             earnings = GigWork.objects.filter(user=user)
+
+#             for earning in earnings:
+#                 month_key = earning.date.strftime("%Y-%m")
+
+#                 if earning.date.day <= 15:
+#                     earnings_by_half_month[month_key]["start"] += earning.total_pay
+#                 else:
+#                     earnings_by_half_month[month_key]["end"] += earning.total_pay
+
+#         # Convert to list of dicts sorted by month
+#         sorted_earnings = sorted(
+#             [{
+#                 "month": k,
+#                 "start": v["start"],
+#                 "end": v["end"],
+#                 "total": v["start"] + v["end"]
+#             } for k, v in earnings_by_half_month.items()],
+#             key=lambda x: x["month"]
+#         )
+#         logging.debug(sorted_earnings)
+            
+        
+#     else:
+#         total_earnings = 0
+#         monthly_earnings = []
+#         sorted_earnings = []
+
+#     return render(request, 'gigwork/list_sort.html', {
+#         'earnings': earnings,
+#         'total_earnings': total_earnings,
+#         'monthly_earnings': monthly_earnings,
+#         'half_month_earnings': sorted_earnings
+#     })
