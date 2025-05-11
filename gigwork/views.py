@@ -30,14 +30,21 @@ def add_gigwork(request):
 @login_required
 def gigwork_list(request):
     gigs = GigWork.objects.filter(user=request.user)
-    
-    total = 0
-    for gig in gigs:
-        total += gig.total_pay
+
+    month = request.GET.get('month')  # format: YYYY-MM
+    if month:
+        try:
+            date_obj = datetime.strptime(month, '%Y-%m')
+            gigs = gigs.filter(date__year=date_obj.year, date__month=date_obj.month)
+        except ValueError:
+            pass  # optionally handle invalid input
+
+    total = sum(gig.total_pay or 0 for gig in gigs)
 
     return render(request, 'gigwork/list.html', {
         'gigs': gigs,
-        'total_earnings': total
+        'total_earnings': total,
+        'selected_month': month,
     })
 
 @login_required

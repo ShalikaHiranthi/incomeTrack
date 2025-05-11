@@ -243,12 +243,12 @@ def sort_earnings(request):
 
             # Fetch for display
             sorted_earnings = Weeklypayments.objects.filter(user=user).order_by('month')
-            logging.debug(sorted_earnings)
+            #logging.debug(sorted_earnings)
             
 
         else:
             sorted_earnings = Weeklypayments.objects.filter(user=user).order_by('month')
-            logging.debug(sorted_earnings)
+            #logging.debug(sorted_earnings)
             total_gigs = (
                 Earning.objects.filter(user=user)
                 .aggregate(total=Sum('sub_total'))['total'] or 0

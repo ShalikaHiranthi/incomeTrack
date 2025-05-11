@@ -6,7 +6,15 @@
     <a href="{% url 'add_gigwork' %}">Add Gigwork</a>
     <a href="{% url 'import_gigwork' %}" class="btn btn-primary">Import from Excel</a>
     <a href="{% url 'export_gigs_excel' %}" class="download-excel">Download as Excel</a>
-  </div>
+</div>
+<div class="home-search">
+  <form method="get">
+    <label for="month">Filter by Month:</label>
+    <input type="month" id="month" name="month" value="{{ selected_month }}">
+    <button type="submit">Search</button>
+  </form>
+</div>
+
 <h2>Gig Work Entries</h2>
 <table>
   <tr>

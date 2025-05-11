@@ -87,7 +87,7 @@
     gap: 15px;
   }
   
-  input[type="text"], input[type="number"], input[type="date"], select, textarea {
+  input[type="text"], input[type="number"], input[type="date"], select, textarea, input[type="month"]{
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -158,4 +158,9 @@
     color: #000;
     font-size: 1.4rem;
     font-weight: bold;
+  }
+  .home-search{
+    display: inline-block;
+    margin: 15px 0;
+    width: 50%;
   }
