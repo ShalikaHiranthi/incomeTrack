@@ -30,6 +30,7 @@
         <th>1st Half ($)</th>
         <th>2nd Half ($)</th>
         <th>Total ($)</th>
+        <th>Net Total ($)</th>
         <th></th>
       </tr>
     </thead>
@@ -59,7 +60,8 @@
             <span class="isnext">Next</span>
           {% endif %}
         </td>
-        <td>${{ item.total|floatformat:2 }}</td>
+        <td><span class="mainpay">${{ item.total|floatformat:2 }}</span></td>
+        <td>${{ item.nettotal|floatformat:2 }}</td>
         <td>
           <a href="{% url 'update_weekly_earning' item.id %}" class="button">Edit</a>
         </td>

@@ -38,10 +38,13 @@ class Weeklypayments(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     month = models.DateField()
     start = models.DecimalField(max_digits=10, decimal_places=2)
+    netpay1 = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     ispaid_part1 = models.CharField(max_length=4, choices=YES_NO_CHOICES)
     end = models.DecimalField(max_digits=10, decimal_places=2)
+    netpay2 = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     ispaid_part2 = models.CharField(max_length=4, choices=YES_NO_CHOICES)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    nettotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return f"{self.user.username} - {self.month.strftime('%Y-%m')}"

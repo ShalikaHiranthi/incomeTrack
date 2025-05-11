@@ -30,6 +30,7 @@
       <th>1st Half ($)</th>
       <th>2nd Half ($)</th>
       <th>Total ($)</th>
+      <th>Net Total ($)</th>
       <th></th>
     </tr>
   </thead>
@@ -37,7 +38,8 @@
     {% for item in half_month_earnings %}
     <tr>
       <td>{{ item.month|date:"F Y" }}</td>
-      <td>${{ item.start|floatformat:2 }}
+      <td>
+        <span class="mainpay">${{ item.start|floatformat:2 }}</span> - ${{ item.netpay1|floatformat:2 }}
         {% if item.ispaid_part1 == "Yes" %}
           <span class="ispaid">Paid</span>
         {% endif %}
@@ -46,7 +48,8 @@
         {% endif %}
 
       </td>
-      <td>${{ item.end|floatformat:2 }}
+      <td>
+        <span class="mainpay">${{ item.end|floatformat:2 }}</span> - ${{ item.netpay2|floatformat:2 }}
         {% if item.ispaid_part2 == "Yes" %}
           <span class="ispaid">Paid</span>
         {% endif %}
@@ -54,7 +57,8 @@
           <span class="isnext">Next</span>
         {% endif %}
       </td>
-      <td>${{ item.total|floatformat:2 }}</td>
+      <td><span class="mainpay">${{ item.total|floatformat:2 }}</span></td>
+      <td>${{ item.nettotal|floatformat:2 }}</td>
       <td>
         <a href="{% url 'update_weekly_pay' item.id %}" class="button">Edit</a>
       </td>

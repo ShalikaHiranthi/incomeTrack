@@ -10,6 +10,7 @@ from django.db.models.functions import TruncMonth
 from collections import defaultdict
 from datetime import datetime
 from django.contrib import messages
+from decimal import Decimal
 import logging
 logger = logging.getLogger(__name__)
 
@@ -227,18 +228,30 @@ def sort_earnings(request):
                 else:
                     earnings_by_half_month[month_key]["end"] += earning.total
 
+            net1 = 0.00
+            net2 = 0.00
+            totalnet = 0.00
             for k, v in earnings_by_half_month.items():
                 
                 total = v["start"] + v["end"]
                 month_date = datetime.strptime(k + "-01", "%Y-%m-%d")
+                if v["start"]:
+                    net1 = v["start"] - (v["start"] * Decimal('3.99') / Decimal('100')) - (v["start"] * Decimal('30') / Decimal('100'))
+                if v["end"]:
+                    net2 = v["end"] - (v["end"] * Decimal('3.99') / Decimal('100')) - (v["end"] * Decimal('30') / Decimal('100'))
                 
+                totalnet = Decimal(net1) + Decimal(net2)
+
                 # Save to database
                 Weeklypayments.objects.create(
                     user=user,
                     month=month_date,
                     start=v["start"],
+                    netpay1 = net1,
                     end=v["end"],
-                    total=total
+                    netpay2 = net2,
+                    total=total,
+                    nettotal=totalnet
                 )
 
             # Fetch for display

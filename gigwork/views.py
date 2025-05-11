@@ -166,12 +166,14 @@ def sort_gigs(request):
                     earnings_by_half_month[month_key]["end"] += earning.total_pay
             net1 = 0
             net2 = 0
+            totalnet=0
             for k, v in earnings_by_half_month.items():
                 
                 total = v["start"] + v["end"]
                 month_date = datetime.strptime(k + "-01", "%Y-%m-%d")
                 net1 = v["start"] - (v["start"]*3.99/100)- (v["start"]*2/100)
                 net2 = v["end"] - (v["end"]*3.99/100) - (v["end"]*2/100)
+                totalnet = net1 + net2
                 
                 # Save to database
                 WeeklyEarning.objects.create(
@@ -181,7 +183,8 @@ def sort_gigs(request):
                     netpay1 = net1,
                     end=v["end"],
                     netpay2 = net2,
-                    total=total
+                    total=total,
+                    nettotal=totalnet
                 )
 
             # Fetch for display
