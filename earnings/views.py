@@ -262,7 +262,7 @@ def sort_earnings(request):
         else:
             sorted_earnings = Weeklypayments.objects.filter(user=user).order_by('month')
             #logging.debug(sorted_earnings)
-            total_gigs = (
+            total_earnings = (
                 Earning.objects.filter(user=user)
                 .aggregate(total=Sum('sub_total'))['total'] or 0
             )
@@ -286,7 +286,7 @@ def sort_earnings(request):
         ]
 
     return render(request, 'earnings/list_sort.html', {
-        'total_gigs': total_gigs,
+        'total_earnings': total_earnings,
         'monthly_data': monthly_data,
         'half_month_earnings': sorted_earnings
     })

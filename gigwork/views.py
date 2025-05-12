@@ -30,6 +30,7 @@ def add_gigwork(request):
 @login_required
 def gigwork_list(request):
     gigs = GigWork.objects.filter(user=request.user)
+    monthgigs = WeeklyEarning.objects.filter(user=request.user)
 
     month = request.GET.get('month')  # format: YYYY-MM
     if month:
@@ -40,10 +41,12 @@ def gigwork_list(request):
             pass  # optionally handle invalid input
 
     total = sum(gig.total_pay or 0 for gig in gigs)
+    nettotal = sum(monthgig.nettotal or 0 for monthgig in monthgigs)
 
     return render(request, 'gigwork/list.html', {
         'gigs': gigs,
-        'total_earnings': total,
+        'total_gigs': total,
+        'nettotal_gigs': nettotal,
         'selected_month': month,
     })
 

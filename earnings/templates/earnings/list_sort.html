@@ -15,7 +15,7 @@
   </div>
 </div>
 <div class="home-container">
-  <p class="total">Total Gigs: <span class="totalamounts">${{ total_gigs|floatformat:2 }}</span></p>
+  <p class="total">Total Earnings: <span class="totalamounts">${{ total_earnings|floatformat:2 }}</span></p>
   <form method="post">
     {% csrf_token %}
     <button type="submit" name="generate" value="1">Generate & Save to DB</button>
