@@ -181,20 +181,34 @@ def edit_earning(request, pk):
 
 @login_required
 def export_earnings_excel(request):
-    earnings = EarningDetail.objects.all()
+    earnings = EarningDetail.objects.all().order_by('earning')
 
     if not earnings:
         return HttpResponse("No earnings to export.", content_type="text/plain")
 
-    # Extract all fields dynamically if needed
     field_names = [field.name for field in EarningDetail._meta.fields]
-    earnings_data = earnings.values(*field_names)  # Include all fields dynamically
+    earnings_data = list(earnings.values(*field_names))  # Convert QuerySet to list of dicts
 
-    df = pd.DataFrame(earnings_data)
+    # Insert empty rows between entries
+    separated_data = []
+    previous_id = None
+    sum = 0
+    for row in earnings_data:
+        current_id = row['earning']
+        if previous_id is not None and current_id != previous_id:
+            separated_data.append({key: '' for key in field_names})
+        separated_data.append(row)
+        previous_id = current_id
+        
+        
+
+    df = pd.DataFrame(separated_data)
+
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=earnings.xlsx'
-    df.to_excel(response, index=False, engine='openpyxl')
 
+    df.to_excel(response, index=False, engine='openpyxl')
+    
     return response
 
 @login_required
@@ -207,9 +221,10 @@ def delete_earning(request, pk):
 def sort_earnings(request):
     user = request.user
     earnings = []
-    total_gigs = 0
+    total_earnings = 0
     sorted_earnings = []
     monthly_data = []
+    nettotal_earnings = 0
 
     if request.user.is_authenticated:
 
@@ -266,6 +281,7 @@ def sort_earnings(request):
                 Earning.objects.filter(user=user)
                 .aggregate(total=Sum('sub_total'))['total'] or 0
             )
+            nettotal_earnings = total_earnings - total_earnings*30/100
 
         # Get monthly data with month and total earnings
         raw_monthly_data = Weeklypayments.objects.filter(user=user).annotate(month_annotated=TruncMonth('month')).values('month_annotated').annotate(
@@ -287,6 +303,7 @@ def sort_earnings(request):
 
     return render(request, 'earnings/list_sort.html', {
         'total_earnings': total_earnings,
+        'nettotal_earnings':nettotal_earnings,
         'monthly_data': monthly_data,
         'half_month_earnings': sorted_earnings
     })
