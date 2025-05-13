@@ -199,8 +199,6 @@ def export_earnings_excel(request):
             separated_data.append({key: '' for key in field_names})
         separated_data.append(row)
         previous_id = current_id
-        
-        
 
     df = pd.DataFrame(separated_data)
 
