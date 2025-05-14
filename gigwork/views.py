@@ -174,7 +174,7 @@ def sort_gigs(request):
             )
 
             # Process gig data
-            #earnings = GigWork.objects.filter(user=user)
+            # earnings = GigWork.objects.filter(user=user)
             earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
 
             for earning in earnings:
