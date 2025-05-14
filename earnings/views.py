@@ -11,6 +11,7 @@ from collections import defaultdict
 from datetime import datetime
 from django.contrib import messages
 from decimal import Decimal
+from django.utils.timezone import now
 import logging
 logger = logging.getLogger(__name__)
 
@@ -227,20 +228,36 @@ def sort_earnings(request):
     if request.user.is_authenticated:
 
         if request.method == 'POST' and request.POST.get("generate") == "1":
+            current_date = now()
+            current_month_key = current_date.strftime("%Y-%m")
             # Clear old entries (optional)
-            Weeklypayments.objects.filter(user=user).delete()
+            #Weeklypayments.objects.filter(user=user).delete()
+            Weeklypayments.objects.filter(
+            user=user,
+            month__year=current_date.year,
+            month__month=current_date.month
+            ).delete()
 
             # Process gig data
-            earnings = EarningDetail.objects.filter()
+            #earnings = EarningDetail.objects.filter()
+            # Filter gigs for the current month only
+            earnings = EarningDetail.objects.filter(
+                date__year=current_date.year,
+                date__month=current_date.month
+            )
             earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
 
             for earning in earnings:
-                month_key = earning.date.strftime("%Y-%m")
                 if earning.date.day <= 15:
-                    earnings_by_half_month[month_key]["start"] += earning.total
+                    logging.debug(earning.total)
+                    earnings_by_half_month[current_month_key]["start"] += earning.total
                 else:
-                    earnings_by_half_month[month_key]["end"] += earning.total
+                    earnings_by_half_month[current_month_key]["end"] += earning.total
 
+            for half_month in earnings_by_half_month.items():
+                logging.debug(half_month)
+
+            
             net1 = 0.00
             net2 = 0.00
             totalnet = 0.00
@@ -274,12 +291,13 @@ def sort_earnings(request):
 
         else:
             sorted_earnings = Weeklypayments.objects.filter(user=user).order_by('month')
-            #logging.debug(sorted_earnings)
+
             total_earnings = (
                 Earning.objects.filter(user=user)
                 .aggregate(total=Sum('sub_total'))['total'] or 0
             )
-            nettotal_earnings = total_earnings - total_earnings*30/100
+            logging.debug(Decimal('3.99'))
+            nettotal_earnings = total_earnings - total_earnings*30/100 - total_earnings*Decimal('3.99')/100
 
         # Get monthly data with month and total earnings
         raw_monthly_data = Weeklypayments.objects.filter(user=user).annotate(month_annotated=TruncMonth('month')).values('month_annotated').annotate(

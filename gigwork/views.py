@@ -10,6 +10,7 @@ from django.db.models import Sum, F, Func, IntegerField, Value, Case, When
 from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
 from collections import defaultdict
+from django.utils.timezone import now
 import logging
 logger = logging.getLogger(__name__)
 
@@ -154,19 +155,33 @@ def sort_gigs(request):
     if request.user.is_authenticated:
 
         if request.method == 'POST' and request.POST.get("generate") == "1":
-            # Clear old entries (optional)
-            WeeklyEarning.objects.filter(user=user).delete()
+            # Current month
+            current_date = now()
+            current_month_key = current_date.strftime("%Y-%m")
+
+            # Delete only current month entries
+            WeeklyEarning.objects.filter(
+            user=user,
+            month__year=current_date.year,
+            month__month=current_date.month
+            ).delete()
+
+            # Filter gigs for the current month only
+            earnings = GigWork.objects.filter(
+                user=user,
+                date__year=current_date.year,
+                date__month=current_date.month
+            )
 
             # Process gig data
-            earnings = GigWork.objects.filter(user=user)
+            #earnings = GigWork.objects.filter(user=user)
             earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
 
             for earning in earnings:
-                month_key = earning.date.strftime("%Y-%m")
                 if earning.date.day <= 15:
-                    earnings_by_half_month[month_key]["start"] += earning.total_pay
+                    earnings_by_half_month[current_month_key]["start"] += earning.total_pay
                 else:
-                    earnings_by_half_month[month_key]["end"] += earning.total_pay
+                    earnings_by_half_month[current_month_key]["end"] += earning.total_pay
             net1 = 0
             net2 = 0
             totalnet=0

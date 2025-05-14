@@ -12,7 +12,7 @@ class EarningForm(forms.ModelForm):
 class EarningDetailForm(forms.ModelForm):
     class Meta:
         model = EarningDetail
-        fields = ['source', 'amount', 'tip']
+        fields = ['source', 'amount', 'tip','total']
 
 class ExcelImportForm(forms.Form):
     file = forms.FileField(label='Select Excel file')
