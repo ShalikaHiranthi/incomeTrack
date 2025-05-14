@@ -130,7 +130,7 @@ def update_subtotal(earning_id):
 
 @login_required
 def earning_list_details(request,id):
-    earning_details = EarningDetail.objects.filter(earning_id=id)
+    earning_details = EarningDetail.objects.filter()
     total = 0
     for detail in earning_details:
         sum = detail.amount + detail.tip
@@ -249,15 +249,10 @@ def sort_earnings(request):
 
             for earning in earnings:
                 if earning.date.day <= 15:
-                    logging.debug(earning.total)
                     earnings_by_half_month[current_month_key]["start"] += earning.total
                 else:
                     earnings_by_half_month[current_month_key]["end"] += earning.total
 
-            for half_month in earnings_by_half_month.items():
-                logging.debug(half_month)
-
-            
             net1 = 0.00
             net2 = 0.00
             totalnet = 0.00
@@ -296,8 +291,8 @@ def sort_earnings(request):
                 Earning.objects.filter(user=user)
                 .aggregate(total=Sum('sub_total'))['total'] or 0
             )
-            logging.debug(Decimal('3.99'))
-            nettotal_earnings = total_earnings - total_earnings*30/100 - total_earnings*Decimal('3.99')/100
+            
+            nettotal_earnings = total_earnings - total_earnings * 30/100 - total_earnings * Decimal('3.99')/100
 
         # Get monthly data with month and total earnings
         raw_monthly_data = Weeklypayments.objects.filter(user=user).annotate(month_annotated=TruncMonth('month')).values('month_annotated').annotate(
