@@ -130,16 +130,19 @@ def update_subtotal(earning_id):
 
 @login_required
 def earning_list_details(request,id):
-    earning_details = EarningDetail.objects.filter()
+    earning_details = EarningDetail.objects.filter(earning_id=id)
     total = 0
+    total_tips = 0
     for detail in earning_details:
         sum = detail.amount + detail.tip
         total += sum
+        total_tips += detail.tip
     
     total_earnings = total
     return render(request, 'earnings/list_details.html', {
         'earning_details': earning_details,
         'earning_id': id,
+        'total_tips': total_tips,
         'total_earnings': total_earnings
     })
 
