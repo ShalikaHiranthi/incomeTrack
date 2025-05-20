@@ -43,6 +43,12 @@
     {% if total_earnings %}
       <p class="total">Total Earnings: <span class="totalamounts">${{ total_earnings|floatformat:2 }}</span></p>
     {% endif %}
+    {% if total_amounts %}
+    <p class="total">Total Amount: <span class="totalamounts">${{ total_amounts|floatformat:2 }}</span></p>
+    {% endif %}
+    {% if total_tips %}
+      <p class="total">Total Tips: <span class="totalamounts">${{ total_tips|floatformat:2 }}</span></p>
+    {% endif %}
     {% if nettotal_earnings %}
       <p class="total">Net Total Earnings: <span class="totalamounts">${{ nettotal_earnings|floatformat:2 }}</span></p>
     {% endif %}

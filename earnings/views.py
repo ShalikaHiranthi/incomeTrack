@@ -28,6 +28,13 @@ def register(request):
 @login_required
 def earning_list(request):
     earnings = Earning.objects.filter(user=request.user)
+    earningdts = EarningDetail.objects.filter()
+
+    total_amounts = 0
+    total_tips = 0
+    for earning_d in earningdts:
+        total_amounts += earning_d.amount
+        total_tips += earning_d.tip
 
     total_earnings = 0
     for earning in earnings:
@@ -35,12 +42,16 @@ def earning_list(request):
     
     return render(request, 'earnings/list.html', {
         'earnings': earnings,
+        'total_amounts': total_amounts,
+        'total_tips': total_tips,
         'total_earnings': total_earnings
     })
 
 @login_required
 def earning_list_sort(request):
     total_earnings = 0
+    total_amounts = 0
+    total_tips = 0
     monthly_earnings = []
     sorted_earnings = []
     
@@ -51,6 +62,10 @@ def earning_list_sort(request):
         total_earnings = (
             Earning.objects.filter(user=user)
             .aggregate(total=Sum('sub_total'))['total'] or 0
+        )
+        total_amounts = (
+            EarningDetail.objects.filter()
+            .aggregate(total=Sum('amount'))['total'] or 0
         )
 
         monthly_earnings = (
@@ -82,6 +97,7 @@ def earning_list_sort(request):
     return render(request, 'earnings/list_sort.html', {
         'earnings': earnings,
         'total_earnings': total_earnings,
+        'total_amounts': total_amounts,
         'monthly_earnings': monthly_earnings,
         'half_month_earnings': sorted_earnings
     })
@@ -133,16 +149,19 @@ def earning_list_details(request,id):
     earning_details = EarningDetail.objects.filter(earning_id=id)
     total = 0
     total_tips = 0
+    total_amounts = 0
     for detail in earning_details:
         sum = detail.amount + detail.tip
         total += sum
         total_tips += detail.tip
+        total_amounts += detail.amount
     
     total_earnings = total
     return render(request, 'earnings/list_details.html', {
         'earning_details': earning_details,
         'earning_id': id,
         'total_tips': total_tips,
+        'total_amounts': total_amounts,
         'total_earnings': total_earnings
     })
 
