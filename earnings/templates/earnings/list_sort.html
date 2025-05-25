@@ -35,7 +35,9 @@
     <tr>
       <th>Month</th>
       <th>1st Half ($)</th>
+      <th>30%</th>
       <th>2nd Half ($)</th>
+      <th>30%</th>
       <th>Total ($)</th>
       <th>Net Total ($)</th>
       <th></th>
@@ -46,7 +48,11 @@
     <tr>
       <td>{{ item.month|date:"F Y" }}</td>
       <td>
-        <span class="mainpay">${{ item.start|floatformat:2 }}</span> - ${{ item.netpay1|floatformat:2 }}
+        <span class="mainpay">Tips: ${{ item.total_tips1|floatformat:2 }}</span>
+        <span class="mainpay">Amounts: ${{ item.total_amount1|floatformat:2 }}</span>
+        <span class="mainpay">Total: ${{ item.start|floatformat:2 }}</span>
+        <span class="mainpay">Revenu: </span> ${{ item.netpay1|floatformat:2 }}
+
         {% if item.ispaid_part1 == "Yes" %}
           <span class="ispaid">Paid</span>
         {% endif %}
@@ -56,12 +62,26 @@
 
       </td>
       <td>
-        <span class="mainpay">${{ item.end|floatformat:2 }}</span> - ${{ item.netpay2|floatformat:2 }}
+        {% if item.per30_1 %}
+          <span class="pay30">${{ item.per30_1|floatformat:2 }}</span>
+        {% endif %}
+      </td>
+      <td>
+        <span class="mainpay">Tips: ${{ item.total_tips2|floatformat:2 }}</span>
+        <span class="mainpay">Amounts: ${{ item.total_amount2|floatformat:2 }}</span>
+        <span class="mainpay">Total: ${{ item.end|floatformat:2 }}</span>
+        <span class="mainpay">Revenu: </span> ${{ item.netpay2|floatformat:2 }}
+
         {% if item.ispaid_part2 == "Yes" %}
           <span class="ispaid">Paid</span>
         {% endif %}
         {% if item.ispaid_part2 == "Next" %}
           <span class="isnext">Next</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if item.per30_2 %}
+          <span class="pay30">${{ item.per30_2|floatformat:2 }}</span>
         {% endif %}
       </td>
       <td><span class="mainpay">${{ item.total|floatformat:2 }}</span></td>

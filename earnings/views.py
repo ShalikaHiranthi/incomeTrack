@@ -267,13 +267,17 @@ def sort_earnings(request):
                 date__year=current_date.year,
                 date__month=current_date.month
             )
-            earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0})
+            earnings_by_half_month = defaultdict(lambda: {"start": 0, "end": 0,"tips1":0, "amounts1":0, "tips2":0, "amounts2":0})
 
             for earning in earnings:
                 if earning.date.day <= 15:
                     earnings_by_half_month[current_month_key]["start"] += earning.total
+                    earnings_by_half_month[current_month_key]["tips1"] += earning.tip
+                    earnings_by_half_month[current_month_key]["amounts1"] += earning.amount
                 else:
                     earnings_by_half_month[current_month_key]["end"] += earning.total
+                    earnings_by_half_month[current_month_key]["tips2"] += earning.tip
+                    earnings_by_half_month[current_month_key]["amounts2"] += earning.amount
 
             net1 = 0.00
             net2 = 0.00
@@ -288,14 +292,24 @@ def sort_earnings(request):
                     net2 = v["end"] - (v["end"] * Decimal('3.99') / Decimal('100')) - (v["end"] * Decimal('30') / Decimal('100'))
                 
                 totalnet = Decimal(net1) + Decimal(net2)
+                per30_1 = v["start"] * Decimal('30') / Decimal('100')
+                logging.debug(per30_1)
+                per30_2 = v["end"] * Decimal('30') / Decimal('100')
+                logging.debug(per30_2)
 
                 # Save to database
                 Weeklypayments.objects.create(
                     user=user,
                     month=month_date,
                     start=v["start"],
+                    total_tips1=v["tips1"],
+                    total_amount1=v["amounts1"],
+                    per30_1 = per30_1,
                     netpay1 = net1,
                     end=v["end"],
+                    total_tips2=v["tips2"],
+                    total_amount2=v["amounts2"],
+                    per30_2 = per30_2,
                     netpay2 = net2,
                     total=total,
                     nettotal=totalnet

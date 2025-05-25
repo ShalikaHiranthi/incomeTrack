@@ -167,4 +167,9 @@
 
   span.mainpay {
     font-size: 10px;
+    display: block;
+  }
+
+  span.pay30 {
+    font-size: 14px;
   }
