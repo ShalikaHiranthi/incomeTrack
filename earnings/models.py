@@ -56,3 +56,22 @@ class Weeklypayments(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.month.strftime('%Y-%m')}"
+    
+class Invoices(models.Model):
+    week_CHOICES = [
+        ("1st 2", "1st 2"),
+        ("last 2", "last 2"),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    title = models.CharField(max_length=100)
+    tips = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amounts = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    percent4 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    percent30 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    revenue = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    month = models.DateField()
+    week = models.CharField(max_length=100, choices=week_CHOICES)
+
+    def __str__(self):
+        return f"{self.title} - {self.total}"

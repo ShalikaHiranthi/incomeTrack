@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Earning, EarningDetail, Weeklypayments
-from .forms import EarningForm, EarningDetailForm, ExcelImportForm, WeeklyPayForm
+from .models import Earning, EarningDetail, Weeklypayments, Invoices
+from .forms import EarningForm, EarningDetailForm, ExcelImportForm, WeeklyPayForm, InvoiceForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 import pandas as pd
@@ -433,3 +433,54 @@ def update_weekly_pay(request, id):
         form = WeeklyPayForm(instance=week)
 
     return render(request, 'earnings/form.html', {'form': form, 'week': week, 'earning_id':id})
+
+@login_required
+def invoice_list(request):
+
+    invoices = Invoices.objects.filter(user=request.user)
+
+    return render(request, 'earnings/invoice_list.html', {
+        'invoices': invoices,
+    })
+
+@login_required
+def add_invoice(request):
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST)
+        if form.is_valid():
+            incoice = form.save(commit=False)
+            incoice.user = request.user
+            incoice.total = incoice.tips + incoice.amounts
+            incoice.percent4 = incoice.total * Decimal('3.99') / Decimal('100')
+            incoice.percent30 = incoice.total * Decimal('30') / Decimal('100')
+            incoice.revenue = incoice.total - incoice.percent4 - incoice.percent30
+            incoice.save()
+            return redirect('invoice_list')
+    else:
+        form = InvoiceForm()
+    return render(request, 'earnings/form.html', {'form': form})
+
+@login_required
+def edit_invoice(request, pk):
+    invoice = get_object_or_404(Invoices, pk=pk)
+
+    if request.method == 'POST':
+        form = InvoiceForm(request.POST, instance=invoice)
+        if form.is_valid():
+            updated_invoice = form.save(commit=False)
+            updated_invoice.total = updated_invoice.tips + updated_invoice.amounts
+            updated_invoice.percent4 = updated_invoice.total * Decimal('3.99') / Decimal('100')
+            updated_invoice.percent30 = updated_invoice.total * Decimal('30') / Decimal('100')
+            updated_invoice.revenue = updated_invoice.total - updated_invoice.percent4 - updated_invoice.percent30
+            updated_invoice.save()
+            return redirect('invoice_list')
+    else:
+        form = InvoiceForm(instance=invoice)
+
+    return render(request, 'earnings/form.html', {'form': form})
+
+@login_required
+def delete_invoice(request, pk):
+    invoice = get_object_or_404(Invoices, pk=pk)
+    invoice.delete()
+    return redirect('invoice_list')
