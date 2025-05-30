@@ -179,6 +179,7 @@ def edit_earning_detail(request, pk):
         form = EarningDetailForm(request.POST, instance=earning_d)
         if form.is_valid():
             updated_earning = form.save(commit=False)
+            updated_earning.total = updated_earning.amount + updated_earning.tip
             updated_earning.save()
             update_subtotal(earning_d.earning_id)
             return redirect('earning_list_details', id=earning_d.earning_id)
