@@ -28,7 +28,6 @@
           <td>{{ earning.title }}</td>
           <td>${{ earning.sub_total }}</td>
           <td>
-            <a href="{% url 'add_earning_details' earning.id %}" class="button">Add Details</a>  |
             <a href="{% url 'earning_list_details' earning.id %}" class="button">View Details</a>  |
             <a href="{% url 'edit_earning' earning.pk %}" class="button">Edit</a>
   |
