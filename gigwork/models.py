@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 class GigWork(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -44,3 +45,21 @@ class WeeklyEarning(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.month.strftime('%Y-%m')}"
+
+class Payments(models.Model):
+    week_CHOICES = [
+        ("1st 2", "1st 2"),
+        ("last 2", "last 2"),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    title = models.CharField(max_length=100)
+    total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    percent4 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    health_ins = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    revenue = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    month = models.DateField()
+    week = models.CharField(max_length=100, choices=week_CHOICES)
+    date = models.DateField(default=datetime.date.today)
+
+    def __str__(self):
+        return f"{self.title} - {self.total}"

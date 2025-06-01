@@ -10,4 +10,8 @@ urlpatterns = [
     path('export/', views.export_gigs_excel, name='export_gigs_excel'),
     path('sort/', views.sort_gigs, name='sort_gigs'),
     path('edit-week/<int:id>/', views.update_weekly_earning, name='update_weekly_earning'),
+    path('invoices/', views.payment_list, name='payment_list'),
+    path('invoices/add', views.add_invoice, name='add_invoice'),
+    path('invoices/delete/<int:pk>/', views.delete_invoice, name='delete_invoice'),
+    path('invoices/edit/<int:pk>/', views.edit_invoice, name='edit_invoice'),
 ]

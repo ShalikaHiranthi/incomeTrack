@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import GigWorkForm, WeeklyEarningForm
-from .models import GigWork, WeeklyEarning
+from .forms import GigWorkForm, WeeklyEarningForm, PaymentForm
+from .models import GigWork, WeeklyEarning, Payments
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from .forms import ExcelImportForm
@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.db.models.functions import TruncMonth
 from collections import defaultdict
 from django.utils.timezone import now
+from decimal import Decimal
 import logging
 logger = logging.getLogger(__name__)
 
@@ -254,3 +255,50 @@ def update_weekly_earning(request, id):
         form = WeeklyEarningForm(instance=week)
 
     return render(request, 'gigwork/form.html', {'form': form, 'week': week, 'earning_id':id})
+
+@login_required
+def payment_list(request):
+
+    invoices = Payments.objects.filter(user=request.user)
+
+    return render(request, 'gigwork/invoice_list.html', {
+        'invoices': invoices,
+    })
+
+@login_required
+def add_invoice(request):
+    if request.method == 'POST':
+        form = PaymentForm(request.POST)
+        if form.is_valid():
+            incoice = form.save(commit=False)
+            incoice.user = request.user
+            incoice.percent4 = incoice.total * Decimal('3.99') / Decimal('100')
+            incoice.health_ins = incoice.total * Decimal('2') / Decimal('100')
+            incoice.save()
+            return redirect('payment_list')
+    else:
+        form = PaymentForm()
+    return render(request, 'gigwork/form.html', {'form': form})
+
+@login_required
+def edit_invoice(request, pk):
+    invoice = get_object_or_404(Payments, pk=pk)
+
+    if request.method == 'POST':
+        form = PaymentForm(request.POST, instance=invoice)
+        if form.is_valid():
+            updated_invoice = form.save(commit=False)
+            updated_invoice.percent4 = updated_invoice.total * Decimal('3.99') / Decimal('100')
+            updated_invoice.health_ins = updated_invoice.total * Decimal('2') / Decimal('100')
+            updated_invoice.save()
+            return redirect('payment_list')
+    else:
+        form = PaymentForm(instance=invoice)
+
+    return render(request, 'gigwork/form.html', {'form': form})
+
+@login_required
+def delete_invoice(request, pk):
+    invoice = get_object_or_404(Payments, pk=pk)
+    invoice.delete()
+    return redirect('payment_list')
