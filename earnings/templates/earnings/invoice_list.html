@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="home-buttons">
-  <a href="{% url 'add_invoice' %}" class="button">Add Invoice</a>
+  <a href="{% url 'add_invoice_w' %}" class="button">Add Invoice</a>
 </div>
 <p>Total Tips: {{ total_tips }}</p>
 
@@ -37,9 +37,9 @@
           <td>${{ invoice.revenue }}</td>
           <td>
             
-            <a href="{% url 'edit_invoice' invoice.pk %}" class="button">Edit</a>
+            <a href="{% url 'edit_invoice_w' invoice.pk %}" class="button">Edit</a>
   |
-            <form action="{% url 'delete_invoice' invoice.pk %}" method="post" style="display:inline;">
+            <form action="{% url 'delete_invoice_w' invoice.pk %}" method="post" style="display:inline;">
               {% csrf_token %}
               <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
             </form>

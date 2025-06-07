@@ -16,8 +16,8 @@ urlpatterns = [
     path('import/', views.import_earnings, name='import_earnings'),
     path('edit-week/<int:id>/', views.update_weekly_pay, name='update_weekly_pay'),
     path('earnings/invoices/', views.invoice_list, name='invoice_list'),
-    path('earnings/invoices/add', views.add_invoice, name='add_invoice'),
-    path('earnings/invoices/delete/<int:pk>/', views.delete_invoice, name='delete_invoice'),
-    path('earnings/invoices/edit/<int:pk>/', views.edit_invoice, name='edit_invoice'),
+    path('earnings/invoices/add', views.add_invoice_w, name='add_invoice_w'),
+    path('earnings/invoices/delete/<int:pk>/', views.delete_invoice_w, name='delete_invoice_w'),
+    path('earnings/invoices/edit/<int:pk>/', views.edit_invoice_w, name='edit_invoice_w'),
 
 ]

@@ -445,7 +445,7 @@ def invoice_list(request):
     })
 
 @login_required
-def add_invoice(request):
+def add_invoice_w(request):
     if request.method == 'POST':
         form = InvoiceForm(request.POST)
         if form.is_valid():
@@ -462,7 +462,7 @@ def add_invoice(request):
     return render(request, 'earnings/form.html', {'form': form})
 
 @login_required
-def edit_invoice(request, pk):
+def edit_invoice_w(request, pk):
     invoice = get_object_or_404(Invoices, pk=pk)
 
     if request.method == 'POST':
@@ -481,7 +481,7 @@ def edit_invoice(request, pk):
     return render(request, 'earnings/form.html', {'form': form})
 
 @login_required
-def delete_invoice(request, pk):
+def delete_invoice_w(request, pk):
     invoice = get_object_or_404(Invoices, pk=pk)
     invoice.delete()
     return redirect('invoice_list')
