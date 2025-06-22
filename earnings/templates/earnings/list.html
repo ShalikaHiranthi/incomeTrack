@@ -15,6 +15,7 @@
   <table class="earnings-table">
     <thead>
       <tr>
+        <th>ID</th>
         <th>Date</th>
         <th>Title</th>
         <th>Sub Total</th>
@@ -24,6 +25,7 @@
     <tbody>
       {% for earning in earnings %}
         <tr>
+          <td>{{earning.id}}</td>
           <td>{{ earning.date }}</td>
           <td>{{ earning.title }}</td>
           <td>${{ earning.sub_total }}</td>

@@ -12,6 +12,7 @@ from datetime import datetime
 from django.contrib import messages
 from decimal import Decimal
 from django.utils.timezone import now
+import numpy as np
 import logging
 logger = logging.getLogger(__name__)
 
@@ -27,8 +28,8 @@ def register(request):
 
 @login_required
 def earning_list(request):
-    earnings = Earning.objects.filter(user=request.user)
-    earningdts = EarningDetail.objects.filter()
+    earnings = Earning.objects.filter(user=request.user).order_by('-id')
+    earningdts = EarningDetail.objects.filter().order_by('-id')
 
     total_amounts = 0
     total_tips = 0
@@ -205,6 +206,44 @@ def edit_earning(request, pk):
 
 @login_required
 def export_earnings_excel(request):
+    earnings = EarningDetail.objects.all().order_by('earning')
+
+    if not earnings:
+        return HttpResponse("No earnings to export.", content_type="text/plain")
+
+    field_names = [field.name for field in EarningDetail._meta.fields]
+    earnings_data = list(earnings.values(*field_names))  # Convert QuerySet to list of dicts
+
+    # Insert empty rows between entries
+    separated_data = []
+    previous_id = None
+    for row in earnings_data:
+        current_id = row['earning']
+        if previous_id is not None and current_id != previous_id:
+            separated_data.append({key: '' for key in field_names})
+        separated_data.append(row)
+        previous_id = current_id
+
+    df = pd.DataFrame(separated_data)
+
+    # Identify numeric fields and convert
+    numeric_fields = ['amount', 'tip', 'total']  # <-- use your actual numeric field names
+    for field in numeric_fields:
+        if field in df.columns:
+            df[field] = pd.to_numeric(df[field], errors='coerce')  # convert, non-numeric will become NaN
+
+    # Replace NaN with empty string if you still want empty rows to remain empty
+    df = df.replace({np.nan: ''})
+
+    # Prepare response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=earnings.xlsx'
+
+    df.to_excel(response, index=False, engine='openpyxl')
+
+    return response
+
+def export_earnings_excel1111(request):
     earnings = EarningDetail.objects.all().order_by('earning')
 
     if not earnings:
