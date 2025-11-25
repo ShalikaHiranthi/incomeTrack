@@ -52,6 +52,7 @@
         <span class="mainpay">Amounts: ${{ item.total_amount1|floatformat:2 }}</span>
         <span class="mainpay">Total: ${{ item.start|floatformat:2 }}</span>
         <span class="mainpay">Revenu: </span> ${{ item.netpay1|floatformat:2 }}
+        <span class="mainpay">need: </span> ${{ item.net1need|floatformat:2 }}
 
         {% if item.ispaid_part1 == "Yes" %}
           <span class="ispaid">Paid</span>
@@ -71,6 +72,7 @@
         <span class="mainpay">Amounts: ${{ item.total_amount2|floatformat:2 }}</span>
         <span class="mainpay">Total: ${{ item.end|floatformat:2 }}</span>
         <span class="mainpay">Revenu: </span> ${{ item.netpay2|floatformat:2 }}
+        <span class="mainpay">need: </span> ${{ item.net2need|floatformat:2 }}
 
         {% if item.ispaid_part2 == "Yes" %}
           <span class="ispaid">Paid</span>

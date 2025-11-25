@@ -292,6 +292,9 @@ def sort_earnings(request):
         if request.method == 'POST' and request.POST.get("generate") == "1":
             current_date = now()
             current_month_key = current_date.strftime("%Y-%m")
+            #now = datetime.now()
+            #current_month_key = '2025-10'
+            #current_date = datetime(now.year, 10, 30, now.hour, now.minute, now.second, now.microsecond)
             # Clear old entries (optional)
             #Weeklypayments.objects.filter(user=user).delete()
             Weeklypayments.objects.filter(
@@ -333,9 +336,9 @@ def sort_earnings(request):
                 
                 totalnet = Decimal(net1) + Decimal(net2)
                 per30_1 = v["start"] * Decimal('30') / Decimal('100')
-                logging.debug(per30_1)
+                #logging.debug(per30_1)
                 per30_2 = v["end"] * Decimal('30') / Decimal('100')
-                logging.debug(per30_2)
+                #logging.debug(per30_2)
 
                 # Save to database
                 Weeklypayments.objects.create(
@@ -377,13 +380,26 @@ def sort_earnings(request):
             total=Sum('total')
         ).order_by('month_annotated')
 
-        # Convert to a JSON-safe structure (datetime and Decimal to float)
+        minrev = Decimal('400')
+        mintarget = minrev * Decimal('100') / Decimal('66.01')
+        
+        for earning in sorted_earnings:
+            earning.net1need = None
+            earning.net2need = None
+
+            if earning.start and earning.start < mintarget:
+                earning.net1need = float(mintarget - earning.start)
+
+            if earning.end and earning.end < mintarget:
+                earning.net2need = float(mintarget - earning.end)
+
+                
         monthly_data = [
             {
                 'month': entry['month_annotated'].strftime('%Y-%m'),  # Format the date as YYYY-MM
                 'start': float(entry['start']),
                 'end': float(entry['end']),
-                'total': float(entry['total'])  # Convert the Decimal to float
+                'total': float(entry['total']),  # Convert the Decimal to float
             }
             for entry in raw_monthly_data
         ]
