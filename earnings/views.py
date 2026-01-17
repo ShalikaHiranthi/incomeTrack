@@ -16,6 +16,8 @@ import numpy as np
 import logging
 logger = logging.getLogger(__name__)
 
+
+
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
@@ -380,7 +382,7 @@ def sort_earnings(request):
             total=Sum('total')
         ).order_by('month_annotated')
 
-        minrev = Decimal('400')
+        minrev = Decimal('300')
         mintarget = minrev * Decimal('100') / Decimal('66.01')
         
         for earning in sorted_earnings:
